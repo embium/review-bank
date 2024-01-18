@@ -9,9 +9,6 @@ import { Inter } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
-import { Docs, Github, Times } from "./icons";
-import { Twitter } from "./icons";
-import { Discord } from "./icons";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 
@@ -51,23 +48,6 @@ export default function RootLayout({
         <body className={`${inter.className} flex min-h-screen flex-col`}>
           <TRPCReactProvider>
             <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
-              <Link href="/" className="flex h-20 items-center gap-2 sm:gap-4">
-                <Image
-                  src="/clerk.svg"
-                  alt="Clerk Logo"
-                  width={102}
-                  height={32}
-                  priority
-                />
-                <Times />
-                <Image
-                  src="/next.svg"
-                  alt="Next.js Logo"
-                  width={90}
-                  height={18}
-                  priority
-                />
-              </Link>
               <div className="grow" />
               <SignedIn>
                 <div className="hidden sm:block">
@@ -98,39 +78,6 @@ export default function RootLayout({
                 priority
               />
               <span className="text-sm">© 2023</span>
-              <nav className="flex grow justify-end sm:gap-2">
-                <a
-                  className="flex gap-2 rounded-md px-3 py-2 text-sm font-semibold text-gray-600 transition duration-100 hover:text-gray-800"
-                  href="https://clerk.com/docs?utm_source=vercel-template&utm_medium=template_repos&utm_campaign=nextjs_template"
-                >
-                  <div className="m-auto">
-                    <Docs />
-                  </div>
-                  <span className="hidden sm:inline"> Visit Clerk Docs</span>
-                  <span className="inline sm:hidden"> Docs</span>
-                </a>
-                <a
-                  className="flex gap-2 rounded-md px-3 py-2 text-sm font-semibold text-gray-600 transition duration-100 hover:text-gray-800"
-                  href="https://github.com/clerkinc/clerk-next-app"
-                >
-                  <div className="m-auto">
-                    <Github />
-                  </div>
-                  <span className="hidden sm:inline"> View on Github</span>
-                </a>
-                <a
-                  className="flex flex-col justify-center p-2 hover:underline"
-                  href="https://twitter.com/ClerkDev"
-                >
-                  <Twitter />
-                </a>
-                <a
-                  className="flex flex-col justify-center p-2 hover:underline"
-                  href="https://discord.com/invite/b5rXHjAg7A"
-                >
-                  <Discord />
-                </a>
-              </nav>
             </footer>
           </TRPCReactProvider>
         </body>
