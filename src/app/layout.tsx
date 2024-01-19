@@ -33,21 +33,6 @@ export default function RootLayout({
             <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
               <div className="grow" />
               <SignedIn>
-                <div className="hidden sm:block">
-                  <OrganizationSwitcher afterCreateOrganizationUrl="/dashboard" />
-                </div>
-                <div className="block sm:hidden">
-                  <OrganizationSwitcher
-                    afterCreateOrganizationUrl="/dashboard"
-                    appearance={{
-                      elements: {
-                        organizationSwitcherTriggerIcon: `hidden`,
-                        organizationPreviewTextContainer: `hidden`,
-                        organizationSwitcherTrigger: `pr-0`,
-                      },
-                    }}
-                  />
-                </div>
                 <UserButton afterSignOutUrl="/" />
               </SignedIn>
             </header>
