@@ -1,33 +1,9 @@
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "@/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
-/*
-const categories: ({
-    childrenCategories: ({
-        childrenCategories: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date | null;
-            name: string;
-            parentCategoryId: string | null;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date | null;
-        name: string;
-        parentCategoryId: string | null;
-    })[];
-} & {
-    ...;
-})[]
-*/
+
 export const userRouter = createTRPCRouter({
   checkExistence: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
@@ -38,7 +14,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   createUser: protectedProcedure
-    .input(z.object({ username: z.string() }))
+    .input(z.object({ username: z.string().min(2) }))
     .mutation(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({
         where: { externalUserId: ctx.user.id },
