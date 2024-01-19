@@ -1,23 +1,15 @@
-import {
-  ClerkProvider,
-  OrganizationSwitcher,
-  SignedIn,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
-import Image from "next/image";
-import Script from "next/script";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Next.js Clerk Template",
+  title: "Review Bank!",
   description:
-    "A simple and powerful Next.js template featuring authentication and user management powered by Clerk.",
-  openGraph: { images: ["/og.png"] },
+    "A place where you can find all your reviews anything and everything.",
 };
 
 export default function RootLayout({
