@@ -39,6 +39,7 @@ export function CreateCategory() {
   const { mutate: createCategory } = api.category.createCategory.useMutation({
     onSuccess: () => {
       setOpen(false);
+      form.setValue("name", "");
       router.refresh();
     },
   });

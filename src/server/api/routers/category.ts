@@ -5,27 +5,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "@/server/api/trpc";
-/*
-const categories: ({
-    childrenCategories: ({
-        childrenCategories: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date | null;
-            name: string;
-            parentCategoryId: string | null;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date | null;
-        name: string;
-        parentCategoryId: string | null;
-    })[];
-} & {
-    ...;
-})[]
-*/
+
 export const categoryRouter = createTRPCRouter({
   getCategories: publicProcedure.query(async ({ ctx }) => {
     const categories = await ctx.db.category.findMany({
@@ -36,13 +16,13 @@ export const categoryRouter = createTRPCRouter({
   createCategory: protectedProcedure
     .input(z.object({ name: z.string().min(2) }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.category.create({
+      const categories = await ctx.db.category.create({
         data: {
           name: input.name,
         },
       });
 
-      return { response: "ok" };
+      return categories;
     }),
   deleteCategory: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -54,5 +34,17 @@ export const categoryRouter = createTRPCRouter({
       });
 
       return { response: "ok" };
+    }),
+  deleteCategories: protectedProcedure
+    .input(z.array(z.object({ id: z.string() })))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.category.deleteMany({
+        where: {
+          id: {
+            in: input.map((category) => category.id),
+          },
+        },
+      });
+      return null;
     }),
 });
