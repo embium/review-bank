@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
+import { Navbar } from "./_components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <body className={`${inter.className} flex min-h-screen flex-col`}>
           <TRPCReactProvider>
             <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
+              <Navbar />
               <div className="grow" />
               <SignedIn>
                 <UserButton afterSignOutUrl="/" />
