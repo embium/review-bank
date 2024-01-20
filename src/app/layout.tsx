@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Navbar } from "./_components/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,17 +24,18 @@ export default function RootLayout({
       <ClerkProvider>
         <body className={`${inter.className} flex min-h-screen flex-col`}>
           <TRPCReactProvider>
-            <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
               <Navbar />
-              <div className="grow" />
-              <SignedIn>
-                <UserButton afterSignOutUrl="/" />
-              </SignedIn>
-            </header>
-            <main className="grow">{children}</main>
-            <footer className="flex h-20 items-center justify-end gap-1 border-t p-10 font-medium">
-              <span className="text-sm">© 2023</span>
-            </footer>
+              <main className="container mx-auto py-10">{children}</main>
+              <footer className="flex h-20 items-center justify-end gap-1 border-t p-10 font-medium">
+                <span className="text-sm">© 2023</span>
+              </footer>
+            </ThemeProvider>
           </TRPCReactProvider>
         </body>
       </ClerkProvider>

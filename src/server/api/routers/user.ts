@@ -3,8 +3,17 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
+  isAdmin: protectedProcedure.output(z.boolean()).query(async ({ ctx }) => {
+    const isAdmin = await ctx.db.user.findUnique({
+      where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
+    });
+
+    return !isAdmin as boolean;
+  }),
+
   checkExistence: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.db.user.findUnique({
       where: { externalUserId: ctx.user.id },
@@ -16,11 +25,27 @@ export const userRouter = createTRPCRouter({
   createUser: protectedProcedure
     .input(z.object({ username: z.string().min(2) }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({
+      const userExistence = await ctx.db.user.findUnique({
         where: { externalUserId: ctx.user.id },
       });
 
-      if (user) return null;
+      if (!!userExistence) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "User already exist",
+        });
+      }
+
+      const usernameExistence = await ctx.db.user.findUnique({
+        where: { username: input.username },
+      });
+
+      if (!!usernameExistence) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Username already taken",
+        });
+      }
 
       await ctx.db.user.create({
         data: {

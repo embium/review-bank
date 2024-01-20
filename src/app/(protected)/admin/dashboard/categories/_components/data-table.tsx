@@ -6,8 +6,8 @@ import {
   getCoreRowModel,
   useReactTable,
   type VisibilityState,
-  type Row,
 } from "@tanstack/react-table";
+import { useState } from "react";
 
 import {
   Table,
@@ -17,23 +17,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
 import { CreateCategory } from "./create-category";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  initData: TData[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
-  data,
+  initData,
 }: DataTableProps<TData, TValue>) {
-  const router = useRouter();
-  //const [data, setData] = useState<TData[]>(initData);
+  const [data, setData] = useState<TData[]>(initData);
+
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     id: false,
   });
@@ -41,8 +40,12 @@ export function DataTable<TData, TValue>({
 
   const { mutate: deleteRows } = api.category.deleteCategories.useMutation({
     onSuccess: () => {
+      const rows: TData[] = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+      setData(data.filter((item) => !rows.includes(item)));
+      console.log(data);
       table.resetRowSelection();
-      router.refresh();
     },
   });
 
@@ -122,6 +125,9 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="py-5">
+        <CreateCategory oldData={data} setData={setData} />
       </div>
     </>
   );

@@ -14,16 +14,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
 
 import { api } from "@/trpc/react";
+import { useState } from "react";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -33,10 +35,18 @@ const formSchema = z.object({
 
 export default function CreateUser() {
   const router = useRouter();
+  const [open, setOpen] = useState(true);
 
   const { mutate: createUser } = api.user.createUser.useMutation({
     onSuccess: () => {
+      setOpen(false);
       router.push("/dashboard");
+    },
+    onError: (error) => {
+      form.setError("username", {
+        type: error.data?.code,
+        message: error.message,
+      });
     },
   });
 
@@ -50,40 +60,41 @@ export default function CreateUser() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     createUser({ username: values.username });
   }
-
   return (
-    <div className="container mx-auto py-10">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create username</CardTitle>
-          <CardDescription>
-            You need to create a username before continuing.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="shadcn" {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      This is your public display name.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">Submit</Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </div>
+    <Dialog open={open}>
+      <DialogContent className="sm:max-w-[425px]">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <DialogHeader>
+              <DialogTitle>Set a username</DialogTitle>
+              <DialogDescription>
+                You need to set a username before you can move on to the next
+                page.
+              </DialogDescription>
+            </DialogHeader>
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="username" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    This is your public display name.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button type="submit">Set username</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

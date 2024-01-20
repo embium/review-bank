@@ -21,8 +21,8 @@ import { Input } from "@/components/ui/input";
 
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useParams } from "next/navigation";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -32,15 +32,22 @@ const formSchema = z.object({
   }),
 });
 
-export function CreateCategory() {
-  const router = useRouter();
+export function CreateCategory<TData>({
+  oldData,
+  setData,
+}: {
+  oldData: TData[];
+  setData: Dispatch<SetStateAction<TData[]>>;
+}) {
+  const params = useParams();
+
   const [open, setOpen] = useState(false);
 
   const { mutate: createCategory } = api.category.createCategory.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setData([...oldData, data] as SetStateAction<TData[]>);
       setOpen(false);
       form.setValue("name", "");
-      router.refresh();
     },
   });
 
@@ -52,7 +59,7 @@ export function CreateCategory() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    createCategory({ name: values.name });
+    createCategory({ id: params.id as string, name: values.name });
   }
   return (
     <Dialog open={open} onOpenChange={setOpen}>
