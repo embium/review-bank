@@ -5,6 +5,7 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "@/trpc/react";
 import { Navbar } from "./_components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import Sidebar from "./_components/sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +32,10 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <Navbar />
-              <main className="container mx-auto py-10">{children}</main>
+              <div className="flex-no-wrap flex">
+                <Sidebar />
+                <main>{children}</main>
+              </div>
               <footer className="flex h-20 items-center justify-end gap-1 p-10 font-medium">
                 <span className="text-sm">© 2023</span>
               </footer>

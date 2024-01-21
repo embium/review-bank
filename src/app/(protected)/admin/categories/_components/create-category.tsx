@@ -43,13 +43,14 @@ export function CreateCategory<TData>({
 
   const [open, setOpen] = useState(false);
 
-  const { mutate: createCategory } = api.category.createCategory.useMutation({
-    onSuccess: (data) => {
-      setData([...oldData, data] as SetStateAction<TData[]>);
-      setOpen(false);
-      form.setValue("name", "");
-    },
-  });
+  const { mutate: createCategory, isLoading } =
+    api.category.createCategory.useMutation({
+      onSuccess: (data) => {
+        setData([...oldData, data] as SetStateAction<TData[]>);
+        setOpen(false);
+        form.setValue("name", "");
+      },
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -89,7 +90,9 @@ export function CreateCategory<TData>({
               )}
             />
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <Button type="submit" disabled={isLoading}>
+                Save changes
+              </Button>
             </DialogFooter>
           </form>
         </Form>

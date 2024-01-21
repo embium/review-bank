@@ -7,8 +7,6 @@ import {
   useReactTable,
   type VisibilityState,
   getPaginationRowModel,
-  type SortingState,
-  getSortedRowModel,
   type ColumnFiltersState,
   getFilteredRowModel,
 } from "@tanstack/react-table";
@@ -38,22 +36,22 @@ export function DataTable<TData, TValue>({
   initData,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState<TData[]>(initData);
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     id: false,
   });
   const [rowSelection, setRowSelection] = useState({});
 
-  const { mutate: deleteRows } = api.category.deleteCategories.useMutation({
-    onSuccess: () => {
-      const rows: TData[] = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original);
-      setData(data.filter((item) => !rows.includes(item)));
-      table.resetRowSelection();
-    },
-  });
+  const { mutate: deleteRows, isLoading } =
+    api.category.deleteCategories.useMutation({
+      onSuccess: () => {
+        const rows: TData[] = table
+          .getSelectedRowModel()
+          .rows.map((row) => row.original);
+        setData(data.filter((item) => !rows.includes(item)));
+        table.resetRowSelection();
+      },
+    });
 
   const table = useReactTable({
     data,
@@ -62,14 +60,11 @@ export function DataTable<TData, TValue>({
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       rowSelection,
       columnVisibility,
-      sorting,
       columnFilters,
     },
   });
@@ -88,7 +83,9 @@ export function DataTable<TData, TValue>({
     <>
       <div className="flex items-center py-4">
         <div hidden={!Object.keys(rowSelection).length}>
-          <Button onClick={deleteSelected}>Delete selected</Button>
+          <Button onClick={deleteSelected} disabled={isLoading}>
+            Delete selected
+          </Button>
         </div>
         <div className="grow" />
         <Input

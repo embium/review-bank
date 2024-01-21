@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { api } from "@/trpc/server";
 
@@ -9,20 +8,12 @@ export const categoryRouter = createTRPCRouter({
   getCategories: protectedProcedure
     .input(z.object({ id: z.optional(z.string()) }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await api.user.isAdmin.query();
-
-      if (!isAdmin) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to view this page.",
-        });
-      }
-
       const categories = await ctx.db.category.findMany({
         where: {
           parentCategoryId: input.id ?? null,
         },
       });
+      console.log(categories);
       return categories;
     }),
   createCategory: protectedProcedure

@@ -33,6 +33,9 @@ export function Navbar() {
 
   return (
     <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
+      <h1 className="px-2 text-2xl sm:text-3xl lg:text-4xl">
+        Review <span className="font-bold">Bank</span>
+      </h1>
       <NavigationMenu>
         <NavigationMenuList>
           <>
@@ -96,13 +99,13 @@ export function Navbar() {
                       </Link>
                     </li>
                     <li>
-                      <Link href="/admin/categories" legacyBehavior passHref>
+                      <a href="/admin/categories">
                         <NavigationMenuLink
                           className={navigationMenuTriggerStyle()}
                         >
                           Categories
                         </NavigationMenuLink>
-                      </Link>
+                      </a>
                     </li>
                   </ul>
                 </NavigationMenuContent>
