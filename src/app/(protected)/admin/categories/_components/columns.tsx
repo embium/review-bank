@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -52,17 +52,24 @@ export const columns: ColumnDef<Category>[] = [
   { accessorKey: "id" },
   {
     accessorKey: "name",
-    header: "Name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Name
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const id = row.getValue("id")?.toString();
       return (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              {" "}
-              <Link href={`/admin/categories/${id}`}>
-                {row.getValue("name")}
-              </Link>
+              <a href={`/admin/categories/${id}`}>{row.getValue("name")}</a>
             </TooltipTrigger>
             <TooltipContent>
               <p>Children Categories</p>
@@ -88,9 +95,7 @@ export const columns: ColumnDef<Category>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               {" "}
-              <Link href={`/admin/categories/${id}`}>
-                Go to children categories
-              </Link>
+              <a href={`/admin/categories/${id}`}>Go to children categories</a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Edit</DropdownMenuItem>

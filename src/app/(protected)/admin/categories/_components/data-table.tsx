@@ -6,6 +6,11 @@ import {
   getCoreRowModel,
   useReactTable,
   type VisibilityState,
+  getPaginationRowModel,
+  type SortingState,
+  getSortedRowModel,
+  type ColumnFiltersState,
+  getFilteredRowModel,
 } from "@tanstack/react-table";
 import { useState } from "react";
 
@@ -19,6 +24,7 @@ import {
 } from "@/components/ui/table";
 
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { api } from "@/trpc/react";
 import { CreateCategory } from "./create-category";
 
@@ -32,7 +38,8 @@ export function DataTable<TData, TValue>({
   initData,
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = useState<TData[]>(initData);
-
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     id: false,
   });
@@ -44,7 +51,6 @@ export function DataTable<TData, TValue>({
         .getSelectedRowModel()
         .rows.map((row) => row.original);
       setData(data.filter((item) => !rows.includes(item)));
-      console.log(data);
       table.resetRowSelection();
     },
   });
@@ -55,9 +61,16 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       rowSelection,
       columnVisibility,
+      sorting,
+      columnFilters,
     },
   });
 
@@ -73,8 +86,19 @@ export function DataTable<TData, TValue>({
 
   return (
     <>
-      <div className="pb-5" hidden={!Object.keys(rowSelection).length}>
-        <Button onClick={deleteSelected}>Delete selected</Button>
+      <div className="flex items-center py-4">
+        <div hidden={!Object.keys(rowSelection).length}>
+          <Button onClick={deleteSelected}>Delete selected</Button>
+        </div>
+        <div className="grow" />
+        <Input
+          placeholder="Filter name..."
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
       </div>
       <div className="rounded-md border">
         <Table>
@@ -125,6 +149,24 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
       </div>
       <div className="py-5">
         <CreateCategory oldData={data} setData={setData} />

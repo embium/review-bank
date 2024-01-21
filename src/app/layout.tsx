@@ -1,4 +1,4 @@
-import { ClerkProvider, SignedIn, UserButton } from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { type Metadata } from "next";
@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Review Bank!",
   description:
-    "A place where you can find all your reviews anything and everything.",
+    "A place where you can find all your reviews for anything and everything.",
 };
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
             >
               <Navbar />
               <main className="container mx-auto py-10">{children}</main>
-              <footer className="flex h-20 items-center justify-end gap-1 border-t p-10 font-medium">
+              <footer className="flex h-20 items-center justify-end gap-1 p-10 font-medium">
                 <span className="text-sm">© 2023</span>
               </footer>
             </ThemeProvider>
