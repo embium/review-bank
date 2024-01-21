@@ -60,7 +60,7 @@ export const columns: ColumnDef<Category>[] = [
           <Tooltip>
             <TooltipTrigger>
               {" "}
-              <Link href={`/admin/dashboard/categories/${id}`}>
+              <Link href={`/admin/categories/${id}`}>
                 {row.getValue("name")}
               </Link>
             </TooltipTrigger>
@@ -88,7 +88,7 @@ export const columns: ColumnDef<Category>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuItem>
               {" "}
-              <Link href={`/admin/dashboard/categories/${id}`}>
+              <Link href={`/admin/categories/${id}`}>
                 Go to children categories
               </Link>
             </DropdownMenuItem>

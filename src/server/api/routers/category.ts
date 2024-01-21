@@ -3,19 +3,18 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { api } from "@/trpc/server";
 
 export const categoryRouter = createTRPCRouter({
   getCategories: protectedProcedure
     .input(z.object({ id: z.optional(z.string()) }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await ctx.db.user.findFirst({
-        where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
-      });
+      const isAdmin = await api.user.isAdmin.query();
 
-      if (!!isAdmin) {
+      if (!isAdmin) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "You are not an Administrator!",
+          message: "You are not authorized to view this page.",
         });
       }
 
@@ -29,14 +28,12 @@ export const categoryRouter = createTRPCRouter({
   createCategory: protectedProcedure
     .input(z.object({ id: z.optional(z.string()), name: z.string().min(2) }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await ctx.db.user.findFirst({
-        where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
-      });
+      const isAdmin = await api.user.isAdmin.query();
 
-      if (!!isAdmin) {
+      if (!isAdmin) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "You are not an Administrator!",
+          message: "You are not authorized to view this page.",
         });
       }
 
@@ -52,14 +49,12 @@ export const categoryRouter = createTRPCRouter({
   deleteCategory: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await ctx.db.user.findFirst({
-        where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
-      });
+      const isAdmin = await api.user.isAdmin.query();
 
-      if (!!isAdmin) {
+      if (!isAdmin) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "You are not an Administrator!",
+          message: "You are not authorized to view this page.",
         });
       }
 
@@ -74,14 +69,12 @@ export const categoryRouter = createTRPCRouter({
   deleteCategories: protectedProcedure
     .input(z.array(z.object({ id: z.string() })))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await ctx.db.user.findFirst({
-        where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
-      });
+      const isAdmin = await api.user.isAdmin.query();
 
-      if (!!isAdmin) {
+      if (!isAdmin) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "You are not an Administrator!",
+          message: "You are not authorized to view this page.",
         });
       }
 

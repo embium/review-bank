@@ -8,9 +8,11 @@ import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
+  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
@@ -25,8 +27,8 @@ import {
 import { api } from "@/trpc/react";
 
 export function Navbar() {
-  const isAdmin = api.user.isAdmin.useQuery();
-  const { isSignedIn } = useUser();
+  const { data: isAdmin, isLoading } = api.user.isAdmin.useQuery();
+  const { isSignedIn, isLoaded } = useUser();
   const { setTheme } = useTheme();
 
   return (
@@ -42,42 +44,68 @@ export function Navbar() {
               </Link>
             </NavigationMenuItem>
           </>
-          {isSignedIn && isAdmin ? (
+
+          {isLoaded &&
+            (isSignedIn ? (
+              <>
+                <NavigationMenuItem>
+                  <Link href="/dashboard" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Dashboard
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </>
+            ) : (
+              <>
+                <NavigationMenuItem>
+                  <Link href="/sign-in" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Sign in
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/sign-up" legacyBehavior passHref>
+                    <NavigationMenuLink
+                      className={navigationMenuTriggerStyle()}
+                    >
+                      Sign up
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              </>
+            ))}
+          {!isLoading && isAdmin && (
             <>
               <NavigationMenuItem>
-                <Link href="/admin/dashboard" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Dashboard
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link
-                  href="/admin/dashboard/categories"
-                  legacyBehavior
-                  passHref
-                >
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Categories
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-            </>
-          ) : (
-            <>
-              <NavigationMenuItem>
-                <Link href="/sign-in" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Sign in
-                  </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/sign-up" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    Sign up
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
+                <NavigationMenuContent className="right:0 absolute left-auto top-full w-auto">
+                  <ul>
+                    <li>
+                      <Link href="/admin/dashboard" legacyBehavior passHref>
+                        <NavigationMenuLink
+                          className={navigationMenuTriggerStyle()}
+                        >
+                          Dashboard
+                        </NavigationMenuLink>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/admin/categories" legacyBehavior passHref>
+                        <NavigationMenuLink
+                          className={navigationMenuTriggerStyle()}
+                        >
+                          Categories
+                        </NavigationMenuLink>
+                      </Link>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
               </NavigationMenuItem>
             </>
           )}
@@ -110,29 +138,3 @@ export function Navbar() {
     </header>
   );
 }
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className,
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";

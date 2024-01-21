@@ -10,8 +10,7 @@ export const userRouter = createTRPCRouter({
     const isAdmin = await ctx.db.user.findUnique({
       where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
     });
-
-    return !isAdmin as boolean;
+    return !!isAdmin as boolean;
   }),
 
   checkExistence: protectedProcedure.query(async ({ ctx }) => {
