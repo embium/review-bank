@@ -151,6 +151,8 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
+        <CreateCategory oldData={data} setData={setData} />
+        <div className="grow" />
         <Button
           variant="outline"
           size="sm"
@@ -167,9 +169,6 @@ export function DataTable<TData, TValue>({
         >
           Next
         </Button>
-      </div>
-      <div className="py-5">
-        <CreateCategory oldData={data} setData={setData} />
       </div>
     </>
   );

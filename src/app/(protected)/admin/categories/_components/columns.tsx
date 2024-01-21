@@ -2,7 +2,6 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { type Category } from "@prisma/client";
-import Link from "next/link";
 
 import {
   Tooltip,
