@@ -1,30 +1,23 @@
 "use client";
 
-import { api } from "@/trpc/react";
+import { type Category } from "@prisma/client";
 import Link from "next/link";
-import { useEffect } from "react";
 
-const Sidebar = () => {
-  const { mutate: getCategories, data: categories } =
-    api.category.getCategories.useMutation({});
+interface SidebarProps {
+  categories: Category[];
+}
 
-  useEffect(() => {
-    getCategories({});
-  }, [getCategories]);
-
+const Sidebar = ({ categories }: SidebarProps) => {
   return (
     <>
       {/* Side drawer menu */}
-      <div
-        className="left-0 top-0 z-40 h-screen w-72 -translate-x-full transition-transform sm:translate-x-0"
-        aria-label="Sidebar"
-      >
+      <div className="left-0 top-0 z-40 mr-3 h-screen w-72 -translate-x-full border-r-2 transition-transform sm:translate-x-0">
         <div className="h-full overflow-y-auto">
           <nav>
-            <div className="px-10 pb-2">
+            <div className="px-10 pb-2 pt-2">
               <h1 className="text-lg font-bold">Categories</h1>
 
-              <ul className="flex flex-col pb-2 text-gray-200">
+              <ul className="flex flex-col pb-2">
                 {categories?.map(({ id, name }, index) => {
                   return (
                     <div key={index}>

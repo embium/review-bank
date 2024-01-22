@@ -13,6 +13,7 @@ import { ZodError } from "zod";
 import { currentUser } from "@clerk/nextjs";
 
 import { db } from "@/server/db";
+import { UserRole } from "@prisma/client";
 
 /**
  * 1. CONTEXT
@@ -70,6 +71,55 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  */
 export const createTRPCRouter = t.router;
 
+const isOnboard = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  const isUsernameSet = await ctx.db.user.findUnique({
+    where: { externalUserId: ctx.user.id },
+  });
+
+  if (!isUsernameSet)
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You must create a username before performing this action",
+    });
+
+  return next({ ctx: { ...ctx, user: ctx.user } });
+});
+
+const isAuthed = t.middleware(({ ctx, next }) => {
+  // `ctx.user` is nullable
+  if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+const isAdmin = t.middleware(async ({ ctx, next }) => {
+  // `ctx.user` is nullable
+  if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  const isAdmin = await ctx.db.user.findUnique({
+    where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
+  });
+
+  console.log(!!isAdmin);
+
+  if (!isAdmin) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  return next({
+    ctx: {
+      // ✅ user value is known to be non-null now
+      user: ctx.user,
+      // ^?
+    },
+  });
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -78,21 +128,6 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure;
-
-export const protectedProcedure = t.procedure.use(
-  async function isAuthed(opts) {
-    const { ctx } = opts;
-    // `ctx.user` is nullable
-    if (!ctx.user) {
-      //     ^?
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-    return opts.next({
-      ctx: {
-        // ✅ user value is known to be non-null now
-        user: ctx.user,
-        // ^?
-      },
-    });
-  },
-);
+export const adminProcedure = t.procedure.use(isAdmin);
+export const protectedProcedure = t.procedure.use(isAuthed);
+export const onboardProcedure = t.procedure.use(isOnboard);

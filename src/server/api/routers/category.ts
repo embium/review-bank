@@ -1,33 +1,41 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { TRPCError } from "@trpc/server";
-import { api } from "@/trpc/server";
+import {
+  adminProcedure,
+  createTRPCRouter,
+  publicProcedure,
+} from "@/server/api/trpc";
 
 export const categoryRouter = createTRPCRouter({
-  getCategories: protectedProcedure
-    .input(z.object({ id: z.optional(z.string()) }))
+  getCategories: publicProcedure
+    .input(
+      z.object({
+        id: z.optional(z.string()),
+        limit: z.optional(z.number()),
+        offset: z.optional(z.number()),
+        column: z.optional(z.string()),
+        order: z.optional(z.string()),
+        name: z.optional(z.string()),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const categories = await ctx.db.category.findMany({
+        take: input.limit,
+        skip: input.offset,
         where: {
+          name: input.name,
           parentCategoryId: input.id ?? null,
         },
+        orderBy: {
+          [input.column!]: input.order,
+        },
       });
-      console.log(categories);
-      return categories;
+      const pageCount = Math.ceil(categories.length / (input.limit ?? 0));
+      return { categories: categories, pageCount: pageCount ?? 1 };
     }),
-  createCategory: protectedProcedure
+  createCategory: adminProcedure
     .input(z.object({ id: z.optional(z.string()), name: z.string().min(2) }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await api.user.isAdmin.query();
-
-      if (!isAdmin) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to view this page.",
-        });
-      }
-
       const categories = await ctx.db.category.create({
         data: {
           name: input.name,
@@ -37,18 +45,9 @@ export const categoryRouter = createTRPCRouter({
 
       return categories;
     }),
-  deleteCategory: protectedProcedure
+  deleteCategory: adminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await api.user.isAdmin.query();
-
-      if (!isAdmin) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to view this page.",
-        });
-      }
-
       await ctx.db.category.delete({
         where: {
           id: input.id,
@@ -57,18 +56,9 @@ export const categoryRouter = createTRPCRouter({
 
       return { response: "ok" };
     }),
-  deleteCategories: protectedProcedure
+  deleteCategories: adminProcedure
     .input(z.array(z.object({ id: z.string() })))
     .mutation(async ({ ctx, input }) => {
-      const isAdmin = await api.user.isAdmin.query();
-
-      if (!isAdmin) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You are not authorized to view this page.",
-        });
-      }
-
       await ctx.db.category.deleteMany({
         where: {
           id: {

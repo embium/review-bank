@@ -32,21 +32,14 @@ const formSchema = z.object({
   }),
 });
 
-export function CreateCategory<TData>({
-  oldData,
-  setData,
-}: {
-  oldData: TData[];
-  setData: Dispatch<SetStateAction<TData[]>>;
-}) {
+export function CreateCategory({}) {
   const params = useParams();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   const { mutate: createCategory, isLoading } =
     api.category.createCategory.useMutation({
-      onSuccess: (data) => {
-        setData([...oldData, data] as SetStateAction<TData[]>);
+      onSuccess: () => {
         setOpen(false);
         form.setValue("name", "");
       },
@@ -62,11 +55,9 @@ export function CreateCategory<TData>({
   function onSubmit(values: z.infer<typeof formSchema>) {
     createCategory({ id: params.id as string, name: values.name });
   }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Create Category</Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create category</DialogTitle>

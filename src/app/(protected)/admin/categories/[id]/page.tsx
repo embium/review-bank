@@ -1,33 +1,42 @@
 import { api } from "@/trpc/server";
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Category } from "@prisma/client";
 
-import { columns } from "../_components/columns";
-import { DataTable } from "../_components/data-table";
+import { CategoriesTableShell } from "@/components/shells/categories-table-shell";
+import { type SearchParams } from "@/types";
+import { categoriesSearchParamsSchema } from "@/lib/validations/params";
 
-async function getData(id: string): Promise<Category[]> {
-  const categories = await api.category.getCategories.mutate({
-    id,
-  });
-  return categories;
+interface CategoriesPageProps {
+  params: {
+    id: string;
+  };
+  searchParams: SearchParams;
 }
 
-export default async function Dashboard({
+export default async function CategoriesPage({
   params,
-}: {
-  params: { id: string };
-}) {
-  const data = await getData(params.id);
+  searchParams,
+}: CategoriesPageProps) {
+  const categoryId = params.id;
 
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Categories</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <DataTable columns={columns} initData={data} />
-      </CardContent>
-    </Card>
-  );
+  const { page, per_page, sort, name } =
+    categoriesSearchParamsSchema.parse(searchParams);
+
+  const fallbackPage = isNaN(page) || page < 1 ? 1 : page;
+  const limit = isNaN(per_page) ? 10 : per_page;
+  const offset = fallbackPage > 0 ? (fallbackPage - 1) * limit : 0;
+  const [column, order] = (sort?.split(".") as [
+    keyof Category | undefined,
+    "asc" | "desc" | undefined,
+  ]) ?? ["createdAt", "asc"];
+
+  const categoriesPromise = api.category.getCategories.mutate({
+    id: categoryId,
+    limit,
+    offset,
+    column,
+    order,
+    name,
+  });
+
+  return <CategoriesTableShell promise={categoriesPromise} />;
 }

@@ -4,6 +4,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { currentUser } from "@clerk/nextjs";
 
 export const userRouter = createTRPCRouter({
   isAdmin: protectedProcedure.output(z.boolean()).query(async ({ ctx }) => {
@@ -11,6 +12,10 @@ export const userRouter = createTRPCRouter({
       where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
     });
     return !!isAdmin as boolean;
+  }),
+
+  currentUser: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.user.id;
   }),
 
   checkExistence: protectedProcedure.query(async ({ ctx }) => {

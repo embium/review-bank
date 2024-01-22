@@ -5,7 +5,6 @@ import Link from "next/link";
 import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 
-import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,7 +14,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,15 +23,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { api } from "@/trpc/react";
 
-export function Navbar() {
-  const { data: isAdmin, isLoading } = api.user.isAdmin.useQuery();
-  const { isSignedIn, isLoaded } = useUser();
+interface NavbarProps {
+  user: string | null;
+  admin: boolean;
+}
+export function Navbar({ user, admin }: NavbarProps) {
   const { setTheme } = useTheme();
 
   return (
-    <header className="flex h-20 items-center gap-4 border-b border-solid border-black border-opacity-20 px-4 sm:px-8">
+    <header className="border-solidborder-opacity-20 flex h-20 items-center gap-4 border-b px-4 sm:px-8">
       <h1 className="px-2 text-2xl sm:text-3xl lg:text-4xl">
         Review <span className="font-bold">Bank</span>
       </h1>
@@ -47,43 +47,35 @@ export function Navbar() {
               </Link>
             </NavigationMenuItem>
           </>
-
-          {isLoaded &&
-            (isSignedIn ? (
-              <>
-                <NavigationMenuItem>
-                  <Link href="/dashboard" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      Dashboard
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </>
-            ) : (
-              <>
-                <NavigationMenuItem>
-                  <Link href="/sign-in" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      Sign in
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link href="/sign-up" legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
-                      Sign up
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-              </>
-            ))}
-          {!isLoading && isAdmin && (
+          {user ? (
+            <>
+              <NavigationMenuItem>
+                <Link href="/dashboard" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Dashboard
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </>
+          ) : (
+            <>
+              <NavigationMenuItem>
+                <Link href="/sign-in" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Sign in
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/sign-up" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Sign up
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </>
+          )}
+          {admin && (
             <>
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Admin</NavigationMenuTrigger>
