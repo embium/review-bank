@@ -35,9 +35,7 @@ interface CategoriesTableShellProps {
   }>;
 }
 
-export function CategoriesTableShell<TData>({
-  promise,
-}: CategoriesTableShellProps) {
+export function CategoriesTableShell({ promise }: CategoriesTableShellProps) {
   const { categories, pageCount } = React.use(promise);
   const [data, setData] = React.useState(categories);
 
@@ -98,7 +96,7 @@ export function CategoriesTableShell<TData>({
       },
       {
         id: "actions",
-        cell: ({ row, table }) => (
+        cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
