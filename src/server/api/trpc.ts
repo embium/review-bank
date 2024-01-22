@@ -107,8 +107,6 @@ const isAdmin = t.middleware(async ({ ctx, next }) => {
     where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
   });
 
-  console.log(!!isAdmin);
-
   if (!isAdmin) throw new TRPCError({ code: "UNAUTHORIZED" });
 
   return next({

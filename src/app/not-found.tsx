@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 function NotFoundPage() {
   return <h1>Page not found</h1>;
 }

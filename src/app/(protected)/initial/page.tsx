@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { api } from "@/trpc/server";
 import { redirect } from "next/navigation";
 import CreateUser from "./_components/create-user";

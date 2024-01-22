@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { api } from "@/trpc/server";
 
 import { CategoriesTableShell } from "@/components/shells/categories-table-shell";
