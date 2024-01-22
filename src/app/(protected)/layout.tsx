@@ -1,5 +1,3 @@
-import { api } from "@/trpc/server";
-
 export default async function ProtectedLayout({
   children,
 }: {

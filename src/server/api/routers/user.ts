@@ -4,7 +4,6 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
-import { currentUser } from "@clerk/nextjs";
 
 export const userRouter = createTRPCRouter({
   isAdmin: protectedProcedure.output(z.boolean()).query(async ({ ctx }) => {
