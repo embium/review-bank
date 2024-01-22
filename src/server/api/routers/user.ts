@@ -1,20 +1,24 @@
 import { z } from "zod";
 
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "@/server/api/trpc";
 
 import { UserRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-  isAdmin: protectedProcedure.output(z.boolean()).query(async ({ ctx }) => {
-    const isAdmin = await ctx.db.user.findUnique({
-      where: { externalUserId: ctx.user.id, role: UserRole.ADMIN },
+  isAdmin: publicProcedure.output(z.boolean()).query(async ({ ctx }) => {
+    const isAdmin = await ctx.db.user.findFirst({
+      where: { externalUserId: ctx.user?.id, role: UserRole.ADMIN },
     });
     return !!isAdmin as boolean;
   }),
 
-  currentUser: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.user.id;
+  currentUser: publicProcedure.query(async ({ ctx }) => {
+    return ctx.user?.id;
   }),
 
   checkExistence: protectedProcedure.query(async ({ ctx }) => {

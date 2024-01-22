@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface NavbarProps {
-  user: string | null;
+  user: string | undefined;
   admin: boolean;
 }
 export function Navbar({ user, admin }: NavbarProps) {
