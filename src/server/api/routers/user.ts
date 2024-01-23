@@ -14,7 +14,7 @@ export const userRouter = createTRPCRouter({
     const isAdmin = await ctx.db.user.findFirst({
       where: { externalUserId: ctx.user?.id, role: UserRole.ADMIN },
     });
-    return !!isAdmin as boolean;
+    return !isAdmin as boolean;
   }),
 
   currentUser: publicProcedure.query(async ({ ctx }) => {
