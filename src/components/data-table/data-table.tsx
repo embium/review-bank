@@ -131,28 +131,6 @@ export function DataTable<TData, TValue>({
   }, [pageIndex, pageSize]);
 
   // Handle server-side sorting
-  const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: column ?? "",
-      desc: order === "desc",
-    },
-  ]);
-
-  React.useEffect(() => {
-    router.push(
-      `${pathname}?${createQueryString({
-        page,
-        sort: sorting[0]?.id
-          ? `${sorting[0]?.id}.${sorting[0]?.desc ? "desc" : "asc"}`
-          : null,
-      })}`,
-      {
-        scroll: false,
-      },
-    );
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorting]);
 
   // Handle server-side filtering
   const debouncedSearchableColumnFilters = JSON.parse(
@@ -244,7 +222,6 @@ export function DataTable<TData, TValue>({
     pageCount: pageCount ?? -1,
     state: {
       pagination,
-      sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
@@ -252,7 +229,6 @@ export function DataTable<TData, TValue>({
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),

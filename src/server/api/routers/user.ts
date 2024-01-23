@@ -11,10 +11,11 @@ import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   isAdmin: publicProcedure.output(z.boolean()).query(async ({ ctx }) => {
-    const isAdmin = await ctx.db.user.findFirst({
+    if (!ctx.user?.id) return false;
+    const isAdmin = await ctx.db.user.findUnique({
       where: { externalUserId: ctx.user?.id, role: UserRole.ADMIN },
     });
-    return !isAdmin as boolean;
+    return !!isAdmin as boolean;
   }),
 
   currentUser: publicProcedure.query(async ({ ctx }) => {
